@@ -1,10 +1,12 @@
 import SshConnection
 
 class ReSync {
-    SshConnection sshConn    
+    SshConnection sshConn
+    String timestamp 
 
     ReSync() {
         sshConn = new SshConnection()
+        timestamp = createTimestampForSession()
 
         if (sshConn.connect()) {
             println "Connected."
@@ -21,20 +23,27 @@ class ReSync {
     /**
      * Creates gzipped tarball of a target directory or files for backing up
      * 
-     * @param archive String filename of gzipped tarball to create
+     * @param archive String base filename of gzipped tarball to create
      * @param target String path of files to backup
      */
     void createBackup(String archive, String target) {
-        String command = "tar -zcvf " + archive + " " + target
+        String fullArchive = archive + "_" + timestamp + ".tar.gz"
+        String command = "tar -zcvf " + fullArchive + " " + target
         sshConn.runCommand(command)
     }
 
+    /**
+     * Obtains current date/time
+     */
+    private String createTimestampForSession() {
+        return new Date().format("YYMMdd-HHmm")
+    }
 
     static void main(String[] args) {
         ReSync reSync = new ReSync()
 
-        reSync.createBackup("templates.tar.gz", "/usr/share/remarkable/templates")
-        reSync.createBackup("images.tar.gz", "/usr/share/remarkable/*.png")
+        reSync.createBackup("templates", "/usr/share/remarkable/templates")
+        reSync.createBackup("images", "/usr/share/remarkable/*.png")
 
         reSync.disconnect()
     }
