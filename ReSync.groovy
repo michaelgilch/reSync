@@ -9,4 +9,10 @@ if (sshConn.connect()) {
     System.exit(1)
 }
 
+createBackups(sshConn)
+
 sshConn.disconnect()
+
+void createBackups(SshConnection sshConn) {
+    sshConn.runCommand("touch a")
+}

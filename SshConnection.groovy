@@ -64,6 +64,19 @@ class SshConnection {
         
         return passwd
     }
+
+    /**
+     * Run a simple command via ssh on the reMarkable2.
+     * 
+     * @param command String command to execute remotely
+     */
+    void runCommand(String command) {
+        Channel channel = session.openChannel("exec")
+        ((ChannelExec) channel).setCommand(command)
+        channel.connect()
+        println "Command '" + command + "' sent."
+        channel.disconnect()
+    }
 }
 
 
