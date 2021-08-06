@@ -1,6 +1,9 @@
 import SshConnection
 
 class ReSync {
+
+    final String BACKUP_DIR = "./backups/"
+
     SshConnection sshConn
     String timestamp 
 
@@ -13,6 +16,11 @@ class ReSync {
         } else {
             println "Error connecting to reMarkable2. Exiting"
             System.exit(1)        
+        }
+
+        File backup_dir = new File(BACKUP_DIR)
+        if (!backup_dir.exists()) { 
+            backup_dir.mkdirs()
         }
     }
 
@@ -34,8 +42,8 @@ class ReSync {
         sleep(5000)
 
         // Transfer backups to local
-        sshConn.scpRemoteToLocal(templatesBackupFile, "./")
-        sshConn.scpRemoteToLocal(imagesBackupFile, "./")
+        sshConn.scpRemoteToLocal(templatesBackupFile, BACKUP_DIR)
+        sshConn.scpRemoteToLocal(imagesBackupFile, BACKUP_DIR)
     }
 
     /**
