@@ -20,20 +20,44 @@ class ReSync {
         sshConn.disconnect()
     }
 
+    void performSync() {
+
+        backupReMarkableFiles()
+
+    }
+
+    void backupReMarkableFiles() {
+        // Create backups on reMarkable2
+        String templatesBackupFile = createBackupTarGz("templates", "/usr/share/remarkable/templates")
+        String imagesBackupFile = createBackupTarGz("images", "/usr/share/remarkable/*.png")
+
+        sleep(5000)
+
+        // Transfer backups to local
+        sshConn.scpRemoteToLocal(templatesBackupFile, "./")
+        sshConn.scpRemoteToLocal(imagesBackupFile, "./")
+    }
+
     /**
      * Creates gzipped tarball of a target directory or files for backing up
      * 
      * @param archive String base filename of gzipped tarball to create
      * @param target String path of files to backup
+     *
+     * @return String filename of gzipped tarball created
      */
-    void createBackup(String archive, String target) {
+    String createBackupTarGz(String archive, String target) {
         String fullArchive = archive + "_" + timestamp + ".tar.gz"
         String command = "tar -zcvf " + fullArchive + " " + target
         sshConn.runCommand(command)
+
+        return fullArchive
     }
 
     /**
      * Obtains current date/time
+     * 
+     * @return String date/timestamp
      */
     private String createTimestampForSession() {
         return new Date().format("YYMMdd-HHmm")
@@ -41,10 +65,7 @@ class ReSync {
 
     static void main(String[] args) {
         ReSync reSync = new ReSync()
-
-        reSync.createBackup("templates", "/usr/share/remarkable/templates")
-        reSync.createBackup("images", "/usr/share/remarkable/*.png")
-
+        reSync.performSync()
         reSync.disconnect()
     }
 
