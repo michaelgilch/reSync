@@ -39,8 +39,6 @@ class ReSync {
         String templatesBackupFile = createBackupTarGz("templates", "/usr/share/remarkable/templates")
         String imagesBackupFile = createBackupTarGz("images", "/usr/share/remarkable/*.png")
 
-        sleep(5000)
-
         // Transfer backups to local
         sshConn.scpRemoteToLocal(templatesBackupFile, BACKUP_DIR)
         sshConn.scpRemoteToLocal(imagesBackupFile, BACKUP_DIR)
@@ -59,7 +57,36 @@ class ReSync {
         String command = "tar -zcvf " + fullArchive + " " + target
         sshConn.runCommand(command)
 
+        // To prevent working with incomplete archives, do not return until the size of the archive is stable
+        int lastFileSize = -1
+        int fileSize = getRemoteFileSize(fullArchive)
+        while (fileSize != lastFileSize) {
+            lastFileSize = fileSize
+            sleep(500)
+            fileSize = getRemoteFileSize(fullArchive)
+        }
+
         return fullArchive
+    }
+
+    /**
+     * Returns the filesize of a remote file.
+     *
+     * @param filePath String path of file to check size
+     * @return int size of file
+     */
+    int getRemoteFileSize(String filePath) {
+        String command = "ls -l | grep " + filePath
+        def results = sshConn.runCommandGetOutput(command)
+
+        def fileSize = 0
+        if (results.exitStatus != 0) {
+            println "Could not get fileSize."
+        } else {
+            // Example output: [drwxr-xr-x, 3, root, root, 12288, Aug, 2, 09:06, templates.bak]
+            fileSize = results.output.split(" +")[4] as Integer
+        }
+        return fileSize
     }
 
     /**

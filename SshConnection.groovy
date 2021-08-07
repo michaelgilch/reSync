@@ -79,6 +79,58 @@ class SshConnection {
     }
 
     /**
+     * Run a remote command via SSH and capture the output.
+     * 
+     * Adapted from http://www.jcraft.com/jsch/examples/Exec.java.html
+     *
+     * @param command String command to execute remotely
+     * @return Map [exitStatus: int, output: string]
+     */
+    def runCommandGetOutput(String command) {
+        Channel channel = session.openChannel("exec")
+        ((ChannelExec) channel).setCommand(command)
+        channel.setInputStream(null)
+        ((ChannelExec)channel).setErrStream(System.err)
+        InputStream in = channel.getInputStream()
+        channel.connect()
+        println "Command '" + command + "' sent."
+
+        // Read in the remote commands output
+        byte[] buffer = new byte[1024]
+
+        def cmdOutput = ""
+        def cmdExitStatus
+        while(true) {
+            while (in.available() > 0) {
+                int i = in.read(buffer, 0, 1024)
+                if (i < 0) break
+                cmdOutput += new String(buffer, 0, i)
+            }
+            
+            if (channel.isClosed()) {
+                if (in.available() > 0) continue;
+                cmdExitStatus = channel.getExitStatus()
+                break;
+            }
+
+            try {
+                Thread.sleep(1000)
+            } catch (Exception e) {
+                println e
+            }
+        }
+
+        channel.disconnect()    
+
+        def results = [
+            exitStatus: cmdExitStatus,
+            output: cmdOutput
+        ]
+
+        return results
+    }
+
+    /**
      * Copy file from reMarkable2 to local working directory.
      *
      * Adapted from https://jcraft.com/jsch/examples/ScpFrom.java.html
