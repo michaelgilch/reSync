@@ -1,3 +1,6 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 /**
  * ReSync will perform the following actions on a reMarkable2 Tablet:
  *
@@ -35,9 +38,10 @@ class ReSync {
     }
 
     void performSync() {
-        backupReMarkableFiles()
-        copyImages()
+        // backupReMarkableFiles()
+        // copyImages()
 
+        updateTemplates()
         /* TODO
          * - fetch templates JSON
          * - update JSON with removed templates
@@ -66,6 +70,28 @@ class ReSync {
             sshConn.scpLocalToRemote(imageFile.toString(), '/usr/share/remarkable/')
         }
     }
+
+    void updateTemplates() {
+        fetchTemplateJson()
+
+        File origJsonTemplates = new File('./templates.orig.json')
+        def jsonSlurper = new JsonSlurper()
+        def jsonData = jsonSlurper.parse(origJsonTemplates)
+
+        // TODO Remove templates that need to be excluded
+
+        // TODO Add custom templates
+
+        def jsonOutStr = JsonOutput.toJson(jsonData)
+        def jsonBeauty = JsonOutput.prettyPrint(jsonOutStr)
+        File newJsonTemplates = new File('./templates.json')
+        newJsonTemplates.write(jsonBeauty)
+    }
+
+    void fetchTemplateJson() {
+        sshConn.scpRemoteToLocal('/usr/share/remarkable/templates/templates.json', './templates.orig.json')
+    }
+
 
     /**
      * Creates gzipped tarball of a target directory or files for backing up
