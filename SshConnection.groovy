@@ -241,6 +241,74 @@ class SshConnection {
         channel.disconnect()
     }
 
+    /** 
+     * Copy file from local to remarkable2.
+     * 
+     * Adapted from: http://www.jcraft.com/jsch/examples/ScpTo.java.html
+     * 
+     * @param localFilename String full path and filename of remote file to transfer.
+     * @param storeToLocation String full path with optional filename of remote location.
+     *  If new filename is not included, filename is taken from localFilename.
+     */
+    void scpLocalToRemote(String localFilename, String storeToLocation) 
+            throws JSchException, IOException {
+
+        // Execute 'scp -t <remoteFilename>' on the remote host.
+        // The undocumented -t (to) flag tells scp that it serves as the client.
+        String command = "scp -t " + storeToLocation
+        Channel channel = session.openChannel("exec")
+        ((ChannelExec) channel).setCommand(command)
+
+        // get I/O streams for remote scp
+        OutputStream out = channel.getOutputStream();
+        InputStream in = channel.getInputStream();
+
+        channel.connect();
+
+        // Check for non-error response from remote
+        if (checkAck(in) != 0) System.exit(0)
+
+        File localFile = new File(localFilename)
+
+        // send "C0644 filesize filename", where filename should not include '/'
+        long filesize = localFile.length()
+        command = "C0644 " + filesize + " "
+        if (localFilename.lastIndexOf('/') > 0) {
+            command += localFilename.substring(localFilename.lastIndexOf('/') + 1)
+        } else {
+            command += localFilename
+        }
+
+        command += "\n"
+        out.write(command.getBytes())
+        out.flush()
+
+        if (checkAck(in) != 0) System.exit(0)
+
+        // Send the contents of the local file to the remote reMarkable2
+        FileInputStream fis = new FileInputStream(localFilename)
+        byte[] buffer = new byte[1024]
+        while (true) {
+            int len = fis.read(buffer, 0, buffer.length)
+            if (len <= 0) break
+            out.write(buffer, 0, len)
+        }
+
+        sendAck(buffer, out)
+
+        if (checkAck(in) != 0) System.exit(0)
+
+        out.close()
+
+        try {
+            if (fis != null) fis.close()
+        } catch (Exception ex) {
+            println ex
+        }
+
+        channel.disconnect()
+    }
+
     /**
      * Checks the SCP Response.
      *
