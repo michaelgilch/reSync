@@ -1,26 +1,32 @@
-import SshConnection
-
+/**
+ * ReSync will perform the following actions on a reMarkable2 Tablet:
+ *
+ * 1. Backup templates and images
+ * 2. Copy custom images to reMarkable2
+ * 3. Update the templates Json file with custom templates and removed templates
+ * 4. Reboot the reMarkable2
+ */
 class ReSync {
 
-    final String BACKUP_DIR = "./backups/"
+    static final String BACKUP_DIR = './backups/'
 
     SshConnection sshConn
-    String timestamp 
+    String timestamp
 
     ReSync() {
         sshConn = new SshConnection()
         timestamp = createTimestampForSession()
 
         if (sshConn.connect()) {
-            println "Connected."
+            println 'Connected.'
         } else {
-            println "Error connecting to reMarkable2. Exiting"
-            System.exit(1)        
+            println 'Error connecting to reMarkable2. Exiting'
+            System.exit(1)
         }
 
-        File backup_dir = new File(BACKUP_DIR)
-        if (!backup_dir.exists()) { 
-            backup_dir.mkdirs()
+        File backupDir = new File(BACKUP_DIR)
+        if (!backupDir.exists()) {
+            backupDir.mkdirs()
         }
     }
 
@@ -29,16 +35,23 @@ class ReSync {
     }
 
     void performSync() {
-
         backupReMarkableFiles()
         copyImages()
 
+        /* TODO
+         * - fetch templates JSON
+         * - update JSON with removed templates
+         * - update JSON with new templates
+         * - copy templates to reMarkable
+         * - copy JSON to reMarkable
+         * - reboot reMarkable
+         */
     }
 
     void backupReMarkableFiles() {
         // Create backups on reMarkable2
-        String templatesBackupFile = createBackupTarGz("templates", "/usr/share/remarkable/templates")
-        String imagesBackupFile = createBackupTarGz("images", "/usr/share/remarkable/*.png")
+        String templatesBackupFile = createBackupTarGz('templates', '/usr/share/remarkable/templates')
+        String imagesBackupFile = createBackupTarGz('images', '/usr/share/remarkable/*.png')
 
         // Transfer backups to local
         sshConn.scpRemoteToLocal(templatesBackupFile, BACKUP_DIR)
@@ -46,26 +59,25 @@ class ReSync {
     }
 
     void copyImages() {
-        File imagesDir = new File("./images/")
+        File imagesDir = new File('./images/')
 
         imagesDir.eachFile { imageFile ->
-            println "Transferring " + imageFile.toString()
-            sshConn.scpLocalToRemote(imageFile.toString(), "/usr/share/remarkable/")
+            println 'Transferring ' + imageFile
+            sshConn.scpLocalToRemote(imageFile.toString(), '/usr/share/remarkable/')
         }
-
     }
 
     /**
      * Creates gzipped tarball of a target directory or files for backing up
-     * 
+     *
      * @param archive String base filename of gzipped tarball to create
      * @param target String path of files to backup
      *
      * @return String filename of gzipped tarball created
      */
     String createBackupTarGz(String archive, String target) {
-        String fullArchive = archive + "_" + timestamp + ".tar.gz"
-        String command = "tar -zcvf " + fullArchive + " " + target
+        String fullArchive = archive + '_' + timestamp + '.tar.gz'
+        String command = 'tar -zcvf ' + fullArchive + ' ' + target
         sshConn.runCommand(command)
 
         // To prevent working with incomplete archives, do not return until the size of the archive is stable
@@ -87,26 +99,26 @@ class ReSync {
      * @return int size of file
      */
     int getRemoteFileSize(String filePath) {
-        String command = "ls -l | grep " + filePath
-        def results = sshConn.runCommandGetOutput(command)
+        String command = 'ls -l | grep ' + filePath
+        Map results = sshConn.runCommandGetOutput(command)
 
-        def fileSize = 0
+        long fileSize = 0
         if (results.exitStatus != 0) {
-            println "Could not get fileSize."
+            println 'Could not get fileSize.'
         } else {
             // Example output: [drwxr-xr-x, 3, root, root, 12288, Aug, 2, 09:06, templates.bak]
-            fileSize = results.output.split(" +")[4] as Integer
+            fileSize = results.output.split(' +')[4] as Integer
         }
         return fileSize
     }
 
     /**
      * Obtains current date/time
-     * 
+     *
      * @return String date/timestamp
      */
     private String createTimestampForSession() {
-        return new Date().format("YYMMdd-HHmm")
+        return new Date().format('YYMMdd-HHmm')
     }
 
     static void main(String[] args) {
@@ -116,7 +128,3 @@ class ReSync {
     }
 
 }
-
-
-
-

@@ -4,12 +4,13 @@ import com.jcraft.jsch.*
  * Class to control connections to the reMarkable2 using Java Secure Channel
  */
 class SshConnection {
+
     Properties config = new Properties()
     Session session
 
     /**
      * Creates JSch Session to reMarkable2.
-     * 
+     *
      * @param username String reMarkable2 username (optional. default = 'root')
      * @param hostname String reMarkable2 IP Address (optional. default = '10.11.99.1')
      * @param port int reMarkable2 SSH port (optional. default = 22)
@@ -17,7 +18,7 @@ class SshConnection {
     SshConnection(String username="root", String hostname="10.11.99.1", int port=22) {
         JSch jsch = new JSch()
         session = jsch.getSession(username, hostname, port)
-        config.put("StrictHostKeyChecking", "no")
+        config.put('StrictHostKeyChecking', 'no')
         session.setConfig(config)
         session.setPassword(getSessionPasswd())
     }
@@ -26,12 +27,12 @@ class SshConnection {
      * Connect the JSch Session.
      */
     boolean connect() {
-        println "Attempting to connect to reMarkable2."
+        println 'Attempting to connect to reMarkable2.'
         try {
             session.connect()
             return true
         } catch (JSchException e) {
-            println e 
+            println e
             return false
         }
     }
@@ -40,7 +41,7 @@ class SshConnection {
      * Disconnect the JSch Session.
      */
     boolean disconnect() {
-        println "Disconnecting JSch Session."
+        println 'Disconnecting JSch Session.'
         session.disconnect()
     }
 
@@ -51,7 +52,7 @@ class SshConnection {
         String passwd = ''
 
         // DEV TESTING: gets password from file
-        File pwTempFile = new File("./pw")
+        File pwTempFile = new File('./pw')
 
         if (pwTempFile.exists()) {
             passwd = pwTempFile.readLines().get(0)
@@ -59,7 +60,7 @@ class SshConnection {
             def cons = System.console()
             if (cons) {
                 passwd = cons.readPassword('Enter your ssh password: ')
-            }    
+            }
         }
 
         return passwd
@@ -67,11 +68,11 @@ class SshConnection {
 
     /**
      * Run a simple command via ssh on the reMarkable2.
-     * 
+     *
      * @param command String command to execute remotely
      */
     void runCommand(String command) {
-        Channel channel = session.openChannel("exec")
+        Channel channel = session.openChannel('exec')
         ((ChannelExec) channel).setCommand(command)
         channel.connect()
         println "Command '" + command + "' sent."
@@ -80,14 +81,14 @@ class SshConnection {
 
     /**
      * Run a remote command via SSH and capture the output.
-     * 
+     *
      * Adapted from http://www.jcraft.com/jsch/examples/Exec.java.html
      *
      * @param command String command to execute remotely
      * @return Map [exitStatus: int, output: string]
      */
     def runCommandGetOutput(String command) {
-        Channel channel = session.openChannel("exec")
+        Channel channel = session.openChannel('exec')
         ((ChannelExec) channel).setCommand(command)
         channel.setInputStream(null)
         ((ChannelExec)channel).setErrStream(System.err)
@@ -98,17 +99,17 @@ class SshConnection {
         // Read in the remote commands output
         byte[] buffer = new byte[1024]
 
-        def cmdOutput = ""
+        def cmdOutput = ''
         def cmdExitStatus
-        while(true) {
+        while (true) {
             while (in.available() > 0) {
                 int i = in.read(buffer, 0, 1024)
-                if (i < 0) break
+                if (i < 0) { break }
                 cmdOutput += new String(buffer, 0, i)
             }
-            
+
             if (channel.isClosed()) {
-                if (in.available() > 0) continue;
+                if (in.available() > 0) { continue }
                 cmdExitStatus = channel.getExitStatus()
                 break;
             }
@@ -120,7 +121,7 @@ class SshConnection {
             }
         }
 
-        channel.disconnect()    
+        channel.disconnect()
 
         def results = [
             exitStatus: cmdExitStatus,
@@ -147,10 +148,10 @@ class SshConnection {
             storeToLocation += File.separator + new File(remoteFilename).getName()
         }
 
-                // Execute 'scp -f <remoteFilename>' on the remote host (reMarkable2).
+        // Execute 'scp -f <remoteFilename>' on the remote host (reMarkable2).
         // The undocumented '-f' (from) flag tells scp that it is to serve as the server.
-        String scpCommand = "scp -f " + remoteFilename
-        Channel channel = session.openChannel("exec")
+        String scpCommand = 'scp -f ' + remoteFilename
+        Channel channel = session.openChannel('exec')
         ((ChannelExec) channel).setCommand(scpCommand)
 
         // Get the IO streams for the remote SCP
@@ -167,7 +168,7 @@ class SshConnection {
         while (true) {
             // The scp command is a single letter follwed by arguments and a new-line.
             // SCP 'C' File Transfer syntax: C permissions size filename
-            if (checkAck(in) != 'C') break
+            if (checkAck(in) != 'C') { break }
 
             // Read in the 5 character permissions ('0644 '), but we don't have to do anything with it
             in.read(buffer, 0, 5)
@@ -178,10 +179,10 @@ class SshConnection {
                 int len = in.read(buffer, 0, 1)
 
                 // length of zero indicates nothing was read (error)
-                if (len < 0) break
+                if (len < 0) { break }
 
                 // space char terminates filesize
-                if (buffer[0] == ' ') break
+                if (buffer[0] == ' ') { break }
 
                 filesize = filesize * 10L + (long) (buffer[0] - (char) '0')
             }
@@ -192,7 +193,7 @@ class SshConnection {
                 int len = in.read(buffer, i, 1)
 
                 // length of zero indicates nothing was read (error)
-                if (len < 0) break
+                if (len < 0) { break }
 
                 // Check for null byte signifying end of the filename
                 if (buffer[i] == (byte) 0x0a) {
@@ -218,45 +219,44 @@ class SshConnection {
                 len = in.read(buffer, 0, len)
 
                 // length of zero indicates nothing was read (error)
-                if (len < 0) break
+                if (len < 0) { break }
 
                 // write to the file until there is no length left
                 fos.write(buffer, 0, len)
                 filesize -= len
-                if (filesize == 0L) break
+                if (filesize == 0L) { break }
             }
 
-            if (checkAck(in) != 0) System.exit(0)
+            if (checkAck(in) != 0) { System.exit(0) }
 
             sendAck(buffer, out)
 
             try {
-                if (fos != null) fos.close()
+                if (fos != null) { fos.close() }
             } catch (Exception e) {
                 println e
             }
-
         }
 
         channel.disconnect()
     }
 
-    /** 
+    /**
      * Copy file from local to remarkable2.
-     * 
+     *
      * Adapted from: http://www.jcraft.com/jsch/examples/ScpTo.java.html
-     * 
+     *
      * @param localFilename String full path and filename of remote file to transfer.
      * @param storeToLocation String full path with optional filename of remote location.
      *  If new filename is not included, filename is taken from localFilename.
      */
-    void scpLocalToRemote(String localFilename, String storeToLocation) 
+    void scpLocalToRemote(String localFilename, String storeToLocation)
             throws JSchException, IOException {
 
         // Execute 'scp -t <remoteFilename>' on the remote host.
         // The undocumented -t (to) flag tells scp that it serves as the client.
-        String command = "scp -t " + storeToLocation
-        Channel channel = session.openChannel("exec")
+        String command = 'scp -t ' + storeToLocation
+        Channel channel = session.openChannel('exec')
         ((ChannelExec) channel).setCommand(command)
 
         // get I/O streams for remote scp
@@ -266,13 +266,13 @@ class SshConnection {
         channel.connect();
 
         // Check for non-error response from remote
-        if (checkAck(in) != 0) System.exit(0)
+        if (checkAck(in) != 0) { System.exit(0) }
 
         File localFile = new File(localFilename)
 
         // send "C0644 filesize filename", where filename should not include '/'
         long filesize = localFile.length()
-        command = "C0644 " + filesize + " "
+        command = 'C0644 ' + filesize + ' '
         if (localFilename.lastIndexOf('/') > 0) {
             command += localFilename.substring(localFilename.lastIndexOf('/') + 1)
         } else {
@@ -283,25 +283,25 @@ class SshConnection {
         out.write(command.getBytes())
         out.flush()
 
-        if (checkAck(in) != 0) System.exit(0)
+        if (checkAck(in) != 0) { System.exit(0) }
 
         // Send the contents of the local file to the remote reMarkable2
         FileInputStream fis = new FileInputStream(localFilename)
         byte[] buffer = new byte[1024]
         while (true) {
             int len = fis.read(buffer, 0, buffer.length)
-            if (len <= 0) break
+            if (len <= 0) { break }
             out.write(buffer, 0, len)
         }
 
         sendAck(buffer, out)
 
-        if (checkAck(in) != 0) System.exit(0)
+        if (checkAck(in) != 0) { System.exit(0) }
 
         out.close()
 
         try {
-            if (fis != null) fis.close()
+            if (fis != null) { fis.close() }
         } catch (Exception ex) {
             println ex
         }
@@ -325,7 +325,7 @@ class SshConnection {
         // Error codes are followed by an error message terminated with a new-line.
         int b = in.read()
 
-        if (b == 0) return b
+        if (b == 0) { return b }
 
         if (b == 1 || b == 2) {
             StringBuffer sb = new StringBuffer()
