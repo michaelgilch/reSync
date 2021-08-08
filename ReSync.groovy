@@ -78,7 +78,14 @@ class ReSync {
         def jsonSlurper = new JsonSlurper()
         def jsonData = jsonSlurper.parse(origJsonTemplates)
 
-        // TODO Remove templates that need to be excluded
+        // Remove templates that need to be excluded
+        def templatesToExclude = []
+        new File('excludes.txt').eachLine { templateFilename ->
+            templatesToExclude << templateFilename
+        }
+        jsonData.templates.removeAll {
+            it.filename in templatesToExclude
+        }
 
         // TODO Add custom templates
 
