@@ -31,6 +31,7 @@ class ReSync {
     void performSync() {
 
         backupReMarkableFiles()
+        copyImages()
 
     }
 
@@ -42,6 +43,16 @@ class ReSync {
         // Transfer backups to local
         sshConn.scpRemoteToLocal(templatesBackupFile, BACKUP_DIR)
         sshConn.scpRemoteToLocal(imagesBackupFile, BACKUP_DIR)
+    }
+
+    void copyImages() {
+        File imagesDir = new File("./images/")
+
+        imagesDir.eachFile { imageFile ->
+            println "Transferring " + imageFile.toString()
+            sshConn.scpLocalToRemote(imageFile.toString(), "/usr/share/remarkable/")
+        }
+
     }
 
     /**
