@@ -38,13 +38,12 @@ class ReSync {
     }
 
     void performSync() {
-        // backupReMarkableFiles()
-        // copyImages()
-
+        backupReMarkableFiles()
+        copyImagesToReMarkable()
+        copyTemplatesToReMarkable()
         updateTemplates()
+
         /* TODO
-         * - fetch templates JSON
-         * - update JSON with removed templates
          * - update JSON with new templates
          * - copy templates to reMarkable
          * - copy JSON to reMarkable
@@ -62,12 +61,21 @@ class ReSync {
         sshConn.scpRemoteToLocal(imagesBackupFile, BACKUP_DIR)
     }
 
-    void copyImages() {
+    void copyImagesToReMarkable() {
         File imagesDir = new File('./images/')
 
         imagesDir.eachFile { imageFile ->
             println 'Transferring ' + imageFile
             sshConn.scpLocalToRemote(imageFile.toString(), '/usr/share/remarkable/')
+        }
+    }
+
+    void copyTemplatesToReMarkable() {
+        File templatesDir = new File('./templates/')
+
+        templatesDir.eachFile { templateFile ->
+            println 'Transferring ' + templateFile
+            sshConn.scpLocalToRemote(templateFile.toString(), '/usr/share/remarkable/templates/')
         }
     }
 
@@ -98,7 +106,6 @@ class ReSync {
     void fetchTemplateJson() {
         sshConn.scpRemoteToLocal('/usr/share/remarkable/templates/templates.json', './templates.orig.json')
     }
-
 
     /**
      * Creates gzipped tarball of a target directory or files for backing up
