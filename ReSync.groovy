@@ -11,25 +11,26 @@ import groovy.json.JsonSlurper
  */
 class ReSync {
 
-    static final String BACKUP_DIR = './backups/'
+    static final String WORK_DIR_PREFIX = './work_'
+
+    static final String RM_HOME_DIR = './'
+    static final String RM_ROOT_DIR = '/usr/share/remarkable/'
+    static final String RM_TEMPLATE_DIR = RM_ROOT_DIR + 'templates/'
+
 
     SshConnection sshConn
-    String timestamp
+    String TIMESTAMP
+    String WORKING_DIR
 
     ReSync() {
         sshConn = new SshConnection()
-        timestamp = createTimestampForSession()
+        TIMESTAMP = createTimestampForSession()
 
         if (sshConn.connect()) {
             println 'Connected.'
         } else {
             println 'Error connecting to reMarkable2. Exiting'
             System.exit(1)
-        }
-
-        File backupDir = new File(BACKUP_DIR)
-        if (!backupDir.exists()) {
-            backupDir.mkdirs()
         }
     }
 
@@ -38,6 +39,7 @@ class ReSync {
     }
 
     void performSync() {
+        createWorkingDir()
         backupReMarkableFiles()
         copyImagesToReMarkable()
         copyTemplatesToReMarkable()
@@ -51,14 +53,19 @@ class ReSync {
          */
     }
 
+    void createWorkingDir() {
+        WORKING_DIR = WORK_DIR_PREFIX + TIMESTAMP + '/'
+        new File(WORKING_DIR).mkdirs()
+    }
+
     void backupReMarkableFiles() {
         // Create backups on reMarkable2
-        String templatesBackupFile = createBackupTarGz('templates', '/usr/share/remarkable/templates')
-        String imagesBackupFile = createBackupTarGz('images', '/usr/share/remarkable/*.png')
+        String templatesBackupFile = createBackupTarGz('templates', RM_TEMPLATE_DIR)
+        String imagesBackupFile = createBackupTarGz('images', RM_ROOT_DIR + '*.png')
 
         // Transfer backups to local
-        sshConn.scpRemoteToLocal(templatesBackupFile, BACKUP_DIR)
-        sshConn.scpRemoteToLocal(imagesBackupFile, BACKUP_DIR)
+        sshConn.scpRemoteToLocal(templatesBackupFile, WORKING_DIR)
+        sshConn.scpRemoteToLocal(imagesBackupFile, WORKING_DIR)
     }
 
     void copyImagesToReMarkable() {
@@ -66,7 +73,7 @@ class ReSync {
 
         imagesDir.eachFile { imageFile ->
             println 'Transferring ' + imageFile
-            sshConn.scpLocalToRemote(imageFile.toString(), '/usr/share/remarkable/')
+            sshConn.scpLocalToRemote(imageFile.toString(), RM_ROOT_DIR)
         }
     }
 
@@ -75,14 +82,14 @@ class ReSync {
 
         templatesDir.eachFile { templateFile ->
             println 'Transferring ' + templateFile
-            sshConn.scpLocalToRemote(templateFile.toString(), '/usr/share/remarkable/templates/')
+            sshConn.scpLocalToRemote(templateFile.toString(), RM_TEMPLATE_DIR)
         }
     }
 
     void updateTemplates() {
         fetchTemplateJson()
 
-        File origJsonTemplates = new File('./templates.orig.json')
+        File origJsonTemplates = new File(WORKING_DIR + 'templates.orig.json')
         def jsonSlurper = new JsonSlurper()
         def jsonData = jsonSlurper.parse(origJsonTemplates)
 
@@ -99,12 +106,12 @@ class ReSync {
 
         def jsonOutStr = JsonOutput.toJson(jsonData)
         def jsonBeauty = JsonOutput.prettyPrint(jsonOutStr)
-        File newJsonTemplates = new File('./templates.json')
+        File newJsonTemplates = new File(WORKING_DIR + 'templates.json')
         newJsonTemplates.write(jsonBeauty)
     }
 
     void fetchTemplateJson() {
-        sshConn.scpRemoteToLocal('/usr/share/remarkable/templates/templates.json', './templates.orig.json')
+        sshConn.scpRemoteToLocal(RM_TEMPLATE_DIR + 'templates.json', WORKING_DIR + 'templates.orig.json')
     }
 
     /**
@@ -116,7 +123,7 @@ class ReSync {
      * @return String filename of gzipped tarball created
      */
     String createBackupTarGz(String archive, String target) {
-        String fullArchive = archive + '_' + timestamp + '.tar.gz'
+        String fullArchive = archive + '_' + TIMESTAMP + '.tar.gz'
         String command = 'tar -zcvf ' + fullArchive + ' ' + target
         sshConn.runCommand(command)
 
@@ -155,7 +162,7 @@ class ReSync {
     /**
      * Obtains current date/time
      *
-     * @return String date/timestamp
+     * @return String date/TIMESTAMP
      */
     private String createTimestampForSession() {
         return new Date().format('YYMMdd-HHmm')
