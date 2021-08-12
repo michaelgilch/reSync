@@ -5,7 +5,7 @@ import groovy.json.JsonSlurper
  * ReSync will perform the following actions on a reMarkable2 Tablet:
  *
  * 1. Backup templates and images
- * 2. Copy custom images to reMarkable2
+ * 2. Copy custom templates and images to reMarkable2
  * 3. Update the templates Json file with custom templates and removed templates
  * 4. Reboot the reMarkable2
  */
@@ -13,18 +13,20 @@ class ReSync {
 
     static final String WORK_DIR_PREFIX = './work_'
 
+    static final String CUSTOM_TEMPLATES_DIR = "./templates/"
+    static final String CUSTOM_IMAGES_DIR = "./images/"
+
     static final String RM_HOME_DIR = './'
     static final String RM_ROOT_DIR = '/usr/share/remarkable/'
     static final String RM_TEMPLATE_DIR = RM_ROOT_DIR + 'templates/'
 
-
     SshConnection sshConn
-    String TIMESTAMP
-    String WORKING_DIR
+    String timestamp
+    String workDir
 
     ReSync() {
         sshConn = new SshConnection()
-        TIMESTAMP = createTimestampForSession()
+        timestamp = createTimestampForSession()
 
         if (sshConn.connect()) {
             println 'Connected.'
@@ -39,7 +41,7 @@ class ReSync {
     }
 
     void performSync() {
-        createWorkingDir()
+        createWorkDirectory()
         backupReMarkableFiles()
         copyImagesToReMarkable()
         copyTemplatesToReMarkable()
@@ -51,9 +53,12 @@ class ReSync {
          */
     }
 
-    void createWorkingDir() {
-        WORKING_DIR = WORK_DIR_PREFIX + TIMESTAMP + '/'
-        new File(WORKING_DIR).mkdirs()
+    /**
+     * Creates a directory in the local filesystem to store files used during the session.
+     */
+    void createWorkDirectory() {
+        workDir = WORK_DIR_PREFIX + timestamp + '/'
+        new File(workDir).mkdirs()
     }
 
     void backupReMarkableFiles() {
@@ -62,32 +67,31 @@ class ReSync {
         String imagesBackupFile = createBackupTarGz('images', RM_ROOT_DIR + '*.png')
 
         // Transfer backups to local
-        sshConn.scpRemoteToLocal(templatesBackupFile, WORKING_DIR)
-        sshConn.scpRemoteToLocal(imagesBackupFile, WORKING_DIR)
+        sshConn.scpRemoteToLocal(templatesBackupFile, workDir)
+        sshConn.scpRemoteToLocal(imagesBackupFile, workDir)
+    }
+
+    void copyDirectoryContentsToRemarkable(String localDirectory, String remarkableDirectory) {
+        println localDirectory
+        File directory = new File(localDirectory)
+        directory.eachFile { file ->
+            println 'Tranferring ' + file
+            sshConn.scpLocalToRemote(file.toString(), remarkableDirectory)
+        }
     }
 
     void copyImagesToReMarkable() {
-        File imagesDir = new File('./images/')
-
-        imagesDir.eachFile { imageFile ->
-            println 'Transferring ' + imageFile
-            sshConn.scpLocalToRemote(imageFile.toString(), RM_ROOT_DIR)
-        }
+        copyDirectoryContentsToRemarkable(CUSTOM_IMAGES_DIR, RM_ROOT_DIR)
     }
 
     void copyTemplatesToReMarkable() {
-        File templatesDir = new File('./templates/')
-
-        templatesDir.eachFile { templateFile ->
-            println 'Transferring ' + templateFile
-            sshConn.scpLocalToRemote(templateFile.toString(), RM_TEMPLATE_DIR)
-        }
+        copyDirectoryContentsToRemarkable(CUSTOM_TEMPLATES_DIR, RM_TEMPLATE_DIR)
     }
 
     void updateTemplates() {
         fetchTemplateJson()
 
-        File origJsonTemplates = new File(WORKING_DIR + 'templates.orig.json')
+        File origJsonTemplates = new File(workDir + 'templates.orig.json')
         def jsonSlurper = new JsonSlurper()
         def jsonData = jsonSlurper.parse(origJsonTemplates)
 
@@ -116,12 +120,12 @@ class ReSync {
         def newJsonFileData = ["templates":templates]
         def jsonOutput = JsonOutput.toJson(newJsonFileData)
         def prettyJsonOutput = JsonOutput.prettyPrint(jsonOutput)
-        File newJsonTemplatesFile = new File(WORKING_DIR + 'templates.json')
+        File newJsonTemplatesFile = new File(workDir + 'templates.json')
         newJsonTemplatesFile.write(prettyJsonOutput)
     }
 
     void fetchTemplateJson() {
-        sshConn.scpRemoteToLocal(RM_TEMPLATE_DIR + 'templates.json', WORKING_DIR + 'templates.orig.json')
+        sshConn.scpRemoteToLocal(RM_TEMPLATE_DIR + 'templates.json', workDir + 'templates.orig.json')
     }
 
     def getCustomTemplateJson() {
@@ -145,7 +149,7 @@ class ReSync {
      * @return String filename of gzipped tarball created
      */
     String createBackupTarGz(String archive, String target) {
-        String fullArchive = archive + '_' + TIMESTAMP + '.tar.gz'
+        String fullArchive = archive + '_' + timestamp + '.tar.gz'
         String command = 'tar -zcvf ' + fullArchive + ' ' + target
         sshConn.runCommand(command)
 
@@ -184,7 +188,7 @@ class ReSync {
     /**
      * Obtains current date/time
      *
-     * @return String date/TIMESTAMP
+     * @return String date/timestamp
      */
     private String createTimestampForSession() {
         return new Date().format('YYMMdd-HHmm')
