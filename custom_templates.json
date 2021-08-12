@@ -1,0 +1,67 @@
+{
+    "templates": [
+        {
+            "name": "Grid mini",
+            "filename": "grid_mini",
+            "iconCode": "\ue99e",
+            "categories": [
+                "Grids",
+                "Custom"
+            ]
+        },        
+        {
+            "name": "Grid micro",
+            "filename": "grid_micro",
+            "iconCode": "\ue99e",
+            "categories": [
+                "Grids",
+                "Custom"
+            ]
+        },
+        {
+          "name": "Lines mini heading",
+          "filename": "lines_mini_heading",
+          "iconCode": "\ue9a8",
+          "categories": [
+            "Custom",
+            "Lines"
+          ]
+        },
+        {
+          "name": "Lines mini",
+          "filename": "lines_mini",
+          "iconCode": "\ue9a8",
+          "categories": [
+            "Custom",
+            "Lines"
+          ]
+        },
+        {
+          "name": "Checklist mini",
+          "filename": "checklist_mini",
+          "iconCode": "\ue98f",
+          "categories": [
+            "Organize",
+            "Custom"
+          ]
+        },
+        {
+          "name": "Weekly Plan",
+          "filename": "weekly_plan",
+          "iconCode": "\ue9a8",
+          "categories": [
+            "Organize",
+            "Custom"
+          ]
+        },
+        {
+          "name": "Meeting Notes",
+          "filename": "meeting_notes",
+          "iconCode": "\ue9a8",
+          "categories": [
+            "Organize",
+            "Custom"
+          ]
+        }
+    ]
+}

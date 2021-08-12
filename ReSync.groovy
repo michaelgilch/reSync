@@ -46,8 +46,6 @@ class ReSync {
         updateTemplates()
 
         /* TODO
-         * - update JSON with new templates
-         * - copy templates to reMarkable
          * - copy JSON to reMarkable
          * - reboot reMarkable
          */
@@ -102,16 +100,40 @@ class ReSync {
             it.filename in templatesToExclude
         }
 
-        // TODO Add custom templates
+        // Convert templates to lists
+        def templates = []
+        jsonData.templates.each { template ->
+            templates << template
+        }
 
-        def jsonOutStr = JsonOutput.toJson(jsonData)
-        def jsonBeauty = JsonOutput.prettyPrint(jsonOutStr)
-        File newJsonTemplates = new File(WORKING_DIR + 'templates.json')
-        newJsonTemplates.write(jsonBeauty)
+        // Add custom templates
+        def newJsonData = getCustomTemplateJson()
+        newJsonData.templates.each { newJson ->
+            templates << newJson
+        }
+
+        // Convert back to JSON
+        def newJsonFileData = ["templates":templates]
+        def jsonOutput = JsonOutput.toJson(newJsonFileData)
+        def prettyJsonOutput = JsonOutput.prettyPrint(jsonOutput)
+        File newJsonTemplatesFile = new File(WORKING_DIR + 'templates.json')
+        newJsonTemplatesFile.write(prettyJsonOutput)
     }
 
     void fetchTemplateJson() {
         sshConn.scpRemoteToLocal(RM_TEMPLATE_DIR + 'templates.json', WORKING_DIR + 'templates.orig.json')
+    }
+
+    def getCustomTemplateJson() {
+        File customTemplateJsonFile = new File('custom_templates.json')
+        def jsonSlurper = new JsonSlurper()
+        def jsonData = jsonSlurper.parse(customTemplateJsonFile)
+
+        jsonData.templates.each {
+            println it
+        }
+
+        return jsonData
     }
 
     /**
