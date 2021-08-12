@@ -87,7 +87,7 @@ class SshConnection {
      * @param command String command to execute remotely
      * @return Map [exitStatus: int, output: string]
      */
-    def runCommandGetOutput(String command) {
+    Map runCommandGetOutput(String command) {
         Channel channel = session.openChannel('exec')
         ((ChannelExec) channel).setCommand(command)
         channel.setInputStream(null)
@@ -111,7 +111,7 @@ class SshConnection {
             if (channel.isClosed()) {
                 if (in.available() > 0) { continue }
                 cmdExitStatus = channel.getExitStatus()
-                break;
+                break
             }
 
             try {
@@ -123,7 +123,7 @@ class SshConnection {
 
         channel.disconnect()
 
-        def results = [
+        Map results = [
             exitStatus: cmdExitStatus,
             output: cmdOutput
         ]
@@ -260,10 +260,10 @@ class SshConnection {
         ((ChannelExec) channel).setCommand(command)
 
         // get I/O streams for remote scp
-        OutputStream out = channel.getOutputStream();
-        InputStream in = channel.getInputStream();
+        OutputStream out = channel.getOutputStream()
+        InputStream in = channel.getInputStream()
 
-        channel.connect();
+        channel.connect()
 
         // Check for non-error response from remote
         if (checkAck(in) != 0) { System.exit(0) }

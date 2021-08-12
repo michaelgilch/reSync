@@ -13,8 +13,8 @@ class ReSync {
 
     static final String WORK_DIR_PREFIX = './work_'
 
-    static final String CUSTOM_TEMPLATES_DIR = "./templates/"
-    static final String CUSTOM_IMAGES_DIR = "./images/"
+    static final String CUSTOM_TEMPLATES_DIR = './templates/'
+    static final String CUSTOM_IMAGES_DIR = './images/'
 
     static final String RM_HOME_DIR = './'
     static final String RM_ROOT_DIR = '/usr/share/remarkable/'
@@ -41,7 +41,7 @@ class ReSync {
     }
 
     void performSync() {
-        createWorkDirectory()
+        makeWorkDirectory()
         backupReMarkableFiles()
         copyImagesToReMarkable()
         copyTemplatesToReMarkable()
@@ -56,11 +56,14 @@ class ReSync {
     /**
      * Creates a directory in the local filesystem to store files used during the session.
      */
-    void createWorkDirectory() {
+    void makeWorkDirectory() {
         workDir = WORK_DIR_PREFIX + timestamp + '/'
         new File(workDir).mkdirs()
     }
 
+    /**
+     * Facilitates the creation and transfer of reMarkable backups.
+     */
     void backupReMarkableFiles() {
         // Create backups on reMarkable2
         String templatesBackupFile = createBackupTarGz('templates', RM_TEMPLATE_DIR)
@@ -71,8 +74,13 @@ class ReSync {
         sshConn.scpRemoteToLocal(imagesBackupFile, workDir)
     }
 
+    /**
+     * Copies the contents of a local directory to a reMarkable directory, using SCP.
+     * 
+     * @param String localDirectory path of local directory to copy from
+     * @param String remarkableDirectory path of remarkable directory to copy to
+     */
     void copyDirectoryContentsToRemarkable(String localDirectory, String remarkableDirectory) {
-        println localDirectory
         File directory = new File(localDirectory)
         directory.eachFile { file ->
             println 'Tranferring ' + file
