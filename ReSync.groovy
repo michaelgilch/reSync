@@ -11,7 +11,7 @@ import groovy.json.JsonSlurper
  */
 class ReSync {
 
-    static final String WORK_DIR_PREFIX = './work_'
+    static final String WORK_DIR_PREFIX = './work/'
 
     static final String CUSTOM_TEMPLATES_DIR = './templates/'
     static final String CUSTOM_IMAGES_DIR = './images/'
