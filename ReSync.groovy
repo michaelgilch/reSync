@@ -11,7 +11,7 @@ import groovy.json.JsonSlurper
  */
 class ReSync {
 
-    static final String WORK_DIR_PREFIX = './work/'
+    static final String WORK_DIR_PARENT = './work/'
 
     static final String CUSTOM_TEMPLATES_DIR = './templates/'
     static final String CUSTOM_IMAGES_DIR = './images/'
@@ -57,7 +57,7 @@ class ReSync {
      * Creates a directory in the local filesystem to store files used during the session.
      */
     void makeWorkDirectory() {
-        workDir = WORK_DIR_PREFIX + timestamp + '/'
+        workDir = WORK_DIR_PARENT + timestamp + '/'
         new File(workDir).mkdirs()
     }
 
@@ -97,29 +97,27 @@ class ReSync {
     }
 
     void updateTemplates() {
-        fetchTemplateJson()
+        fetchTemplatesJsonFile()
 
-        File origJsonTemplates = new File(workDir + 'templates.orig.json')
-        def jsonSlurper = new JsonSlurper()
-        def jsonData = jsonSlurper.parse(origJsonTemplates)
+        def origJsonData = extractJsonFromFile(new File(workDir + 'templates.orig.json'))
 
         // Remove templates that need to be excluded
         def templatesToExclude = []
         new File('excludes.txt').eachLine { templateFilename ->
             templatesToExclude << templateFilename
         }
-        jsonData.templates.removeAll {
+        origJsonData.templates.removeAll {
             it.filename in templatesToExclude
         }
 
         // Convert templates to lists
         def templates = []
-        jsonData.templates.each { template ->
+        origJsonData.templates.each { template ->
             templates << template
         }
 
         // Add custom templates
-        def newJsonData = getCustomTemplateJson()
+        def newJsonData = extractJsonFromFile(new File('custom_templates.json'))
         newJsonData.templates.each { newJson ->
             templates << newJson
         }
@@ -132,20 +130,17 @@ class ReSync {
         newJsonTemplatesFile.write(prettyJsonOutput)
     }
 
-    void fetchTemplateJson() {
-        sshConn.scpRemoteToLocal(RM_TEMPLATE_DIR + 'templates.json', workDir + 'templates.orig.json')
+    def extractJsonFromFile(File jsonFile) {
+        def jsonSlurper = new JsonSlurper()
+        def jsonData = jsonSlurper.parse(jsonFile)
+        return jsonData
     }
 
-    def getCustomTemplateJson() {
-        File customTemplateJsonFile = new File('custom_templates.json')
-        def jsonSlurper = new JsonSlurper()
-        def jsonData = jsonSlurper.parse(customTemplateJsonFile)
-
-        jsonData.templates.each {
-            println it
-        }
-
-        return jsonData
+    /**
+     * Obtains the templates.json file from the reMarkable2
+     */
+    void fetchTemplatesJsonFile() {
+        sshConn.scpRemoteToLocal(RM_TEMPLATE_DIR + 'templates.json', workDir + 'templates.orig.json')
     }
 
     /**
