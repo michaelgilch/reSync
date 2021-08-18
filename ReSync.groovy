@@ -43,12 +43,12 @@ class ReSync {
     void performSync() {
         makeWorkDirectory()
         backupReMarkableFiles()
+        updateTemplates()
         copyImagesToReMarkable()
         copyTemplatesToReMarkable()
-        updateTemplates()
+        copyJsonToReMarkable()
 
         /* TODO
-         * - copy JSON to reMarkable
          * - reboot reMarkable
          */
     }
@@ -94,6 +94,11 @@ class ReSync {
 
     void copyTemplatesToReMarkable() {
         copyDirectoryContentsToRemarkable(CUSTOM_TEMPLATES_DIR, RM_TEMPLATE_DIR)
+    }
+
+    void copyJsonToReMarkable() {
+        String newJsonTemplatesFile = workDir + 'templates.json'
+        sshConn.scpLocalToRemote(newJsonTemplatesFile, RM_TEMPLATE_DIR)
     }
 
     void updateTemplates() {
