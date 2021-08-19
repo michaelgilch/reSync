@@ -47,10 +47,9 @@ class ReSync {
         copyImagesToReMarkable()
         copyTemplatesToReMarkable()
         copyJsonToReMarkable()
+        rebootReMarkable()
 
-        /* TODO
-         * - reboot reMarkable
-         */
+        println 'reMarkable reSync complete!'
     }
 
     /**
@@ -83,7 +82,7 @@ class ReSync {
     void copyDirectoryContentsToRemarkable(String localDirectory, String remarkableDirectory) {
         File directory = new File(localDirectory)
         directory.eachFile { file ->
-            println 'Tranferring ' + file
+            println 'Transferring ' + file
             sshConn.scpLocalToRemote(file.toString(), remarkableDirectory)
         }
     }
@@ -139,6 +138,11 @@ class ReSync {
         def jsonSlurper = new JsonSlurper()
         def jsonData = jsonSlurper.parse(jsonFile)
         return jsonData
+    }
+
+    void rebootReMarkable() {
+        println 'Restarting reMarkable xochitl service...'
+        sshConn.runCommand('systemctl restart xochitl')
     }
 
     /**
