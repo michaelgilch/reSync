@@ -203,7 +203,7 @@ class ReSync {
      * @return String date/timestamp
      */
     private String createTimestampForSession() {
-        return new Date().format('YYMMdd-HHmm')
+        return new Date().format('yyMMdd-HHmm')
     }
 
     static void main(String[] args) {
