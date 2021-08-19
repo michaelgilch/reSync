@@ -153,7 +153,7 @@ class ReSync {
     }
 
     /**
-     * Creates gzipped tarball of a target directory or files for backing up
+     * Creates gzipped tarball of a target directory or files
      *
      * @param archive String base filename of gzipped tarball to create
      * @param target String path of files to backup
@@ -161,20 +161,49 @@ class ReSync {
      * @return String filename of gzipped tarball created
      */
     String createBackupTarGz(String archive, String target) {
-        String fullArchive = archive + '_' + timestamp + '.tar.gz'
-        String command = 'tar -zcvf ' + fullArchive + ' ' + target
-        sshConn.runCommand(command)
+        String fullArchiveFilename = getArchiveFilename(archive)
 
-        // To prevent working with incomplete archives, do not return until the size of the archive is stable
+        sshConn.runCommand(getTarGzCommand(fullArchiveFilename, target))
+        waitForStableFileSize(fullArchiveFilename)
+
+        return fullArchiveFilename
+    }
+
+    /**
+     * Constructs a full filename for an archive based on the archive name and timestamp
+     *
+     * @param String base name for archive
+     * @return String filename including timestamp and extensions
+     */
+    String getArchiveFilename(String basename) {
+        return basename + '_' + timestamp + '.tar.gz'
+    }
+
+    /**
+     * Constructs a tar gz command to create the archive based on the archive name and target
+     *
+     * @param String archiveFilename filename of archive to create
+     * @param String target filepath of archive contents
+     * @return String command to run to produce archive
+     */
+    String getTarGzCommand(String archiveFilename, String target) {
+        return 'tar -zcvf ' + archiveFilename + ' ' + target
+    }
+
+    /**
+     * Waits until a filesize is stable (no longer growing or shrinking)
+     *
+     * @param String filePath location of file
+     */
+    void waitForStableFileSize(String filePath) {
+        println 'Waiting for stable filesize for ' + filePath
         int lastFileSize = -1
-        int fileSize = getRemoteFileSize(fullArchive)
+        int fileSize = getRemoteFileSize(filePath)
         while (fileSize != lastFileSize) {
             lastFileSize = fileSize
-            sleep(500)
-            fileSize = getRemoteFileSize(fullArchive)
+            sleep(250)
+            fileSize = getRemoteFileSize(filePath)
         }
-
-        return fullArchive
     }
 
     /**
@@ -202,7 +231,7 @@ class ReSync {
      *
      * @return String date/timestamp
      */
-    private String createTimestampForSession() {
+    String createTimestampForSession() {
         return new Date().format('yyMMdd-HHmm')
     }
 
