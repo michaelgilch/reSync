@@ -26,6 +26,12 @@ class ReSync {
     String timestamp
     String workDir
 
+    static void main(String[] args) {
+        ReSync reSync = new ReSync()
+        reSync.performSync()
+        reSync.disconnect()
+    }
+
     ReSync() {
         sshConn = new SshConnection()
         timestamp = createTimestampForSession()
@@ -137,7 +143,7 @@ class ReSync {
     }
 
     def extractJsonFromFile(File jsonFile) {
-        def jsonSlurper = new JsonSlurper()
+        JsonSlurper jsonSlurper = new JsonSlurper()
         def jsonData = jsonSlurper.parse(jsonFile)
         return jsonData
     }
@@ -151,7 +157,7 @@ class ReSync {
      * Obtains the templates.json file from the reMarkable2
      */
     void fetchTemplatesJsonFile() {
-        sshConn.scpRemoteToLocal(RM_TEMPLATES_JSON_FILENAME, workDir + + TEMPLATES_JSON_FILENAME + '.orig')
+        sshConn.scpRemoteToLocal(RM_TEMPLATES_JSON_FILENAME, workDir + TEMPLATES_JSON_FILENAME + '.orig')
     }
 
     /**
@@ -174,7 +180,7 @@ class ReSync {
     /**
      * Constructs a full filename for an archive based on the archive name and timestamp.
      *
-     * @param basename the base of the archive filename to create, without timestamp or extension 
+     * @param basename the base of the archive filename to create, without timestamp or extension
      * @return the full filename of archive file to create, with timestamp and extension
      */
     String getArchiveFilename(String basename) {
@@ -198,12 +204,12 @@ class ReSync {
      * @param filepath full path and filename of remote file to monitor
      */
     void waitForStableFileSize(String filePath) {
-        int sleepTimeBetweenFilesizeChecksInMillis = 250       
+        int sleepTimeBetweenFilesizeChecksInMillis = 250
         int fileSize = getRemoteFileSize(filePath)
         int lastFileSize = -1
 
         println "Waiting for stable filesize for ${filePath}"
-        
+
         while (fileSize != lastFileSize) {
             sleep(sleepTimeBetweenFilesizeChecksInMillis)
 
@@ -227,7 +233,7 @@ class ReSync {
         } else {
             // Example output: [drwxr-xr-x, 3, root, root, 12288, Aug, 2, 09:06, templates.bak]
             fileSize = results.output.split(' +')[4] as Integer
-            println 'Size of ' + filePath ' = ' + fileSize
+            println 'Size of ' + filePath + ' = ' + fileSize
         }
         return fileSize
     }
@@ -239,7 +245,7 @@ class ReSync {
      * @return command to run to produce the `ls` results
      */
     String getLsCommand(String filename) {
-        return "ls --format=list ${filename}"
+        return "ls -l ${filename}"
     }
 
     /**
@@ -249,12 +255,6 @@ class ReSync {
      */
     String createTimestampForSession() {
         return new Date().format('yyMMdd-HHmm')
-    }
-
-    static void main(String[] args) {
-        ReSync reSync = new ReSync()
-        reSync.performSync()
-        reSync.disconnect()
     }
 
 }
