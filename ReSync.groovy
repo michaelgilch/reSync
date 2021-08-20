@@ -11,10 +11,11 @@ import groovy.json.JsonSlurper
  */
 class ReSync {
 
-    static final String WORK_DIR_PARENT = './work/'
-
     static final String CUSTOM_TEMPLATES_DIR = './templates/'
     static final String CUSTOM_IMAGES_DIR = './images/'
+    static final String WORK_DIR_PARENT = './work/'
+
+    static final String ORIG_FILE_EXTENSION = '.orig'
     static final String TEMPLATES_JSON_FILENAME = 'templates.json'
 
     static final String RM_HOME_DIR = './'
@@ -111,40 +112,40 @@ class ReSync {
     void updateTemplates() {
         fetchTemplatesJsonFile()
 
-        def origJsonData = extractJsonFromFile(new File(workDir + TEMPLATES_JSON_FILENAME + '.orig'))
+        Map origJsonData = extractJsonFromFile(new File(workDir + TEMPLATES_JSON_FILENAME + ORIG_FILE_EXTENSION))
 
         // Remove templates that need to be excluded
-        def templatesToExclude = []
+        List templatesToExclude = []
         new File('excludes.txt').eachLine { templateFilename ->
             templatesToExclude << templateFilename
         }
-        origJsonData.templates.removeAll {
-            it.filename in templatesToExclude
+        origJsonData.templates.removeAll { originalTemplate ->
+            originalTemplate.filename in templatesToExclude
         }
 
         // Convert templates to lists
-        def templates = []
+        List templates = []
         origJsonData.templates.each { template ->
             templates << template
         }
 
         // Add custom templates
-        def newJsonData = extractJsonFromFile(new File('custom_' + TEMPLATES_JSON_FILENAME))
+        Map newJsonData = extractJsonFromFile(new File('custom_' + TEMPLATES_JSON_FILENAME))
         newJsonData.templates.each { newJson ->
             templates << newJson
         }
 
         // Convert back to JSON
-        def newJsonFileData = ["templates":templates]
-        def jsonOutput = JsonOutput.toJson(newJsonFileData)
-        def prettyJsonOutput = JsonOutput.prettyPrint(jsonOutput)
+        Map newJsonFileData = ['templates':templates]
+        String jsonOutput = JsonOutput.toJson(newJsonFileData)
+        String prettyJsonOutput = JsonOutput.prettyPrint(jsonOutput)
         File newJsonTemplatesFile = new File(workDir + TEMPLATES_JSON_FILENAME)
         newJsonTemplatesFile.write(prettyJsonOutput)
     }
 
-    def extractJsonFromFile(File jsonFile) {
+    Map extractJsonFromFile(File jsonFile) {
         JsonSlurper jsonSlurper = new JsonSlurper()
-        def jsonData = jsonSlurper.parse(jsonFile)
+        Map jsonData = jsonSlurper.parse(jsonFile)
         return jsonData
     }
 
@@ -157,7 +158,8 @@ class ReSync {
      * Obtains the templates.json file from the reMarkable2
      */
     void fetchTemplatesJsonFile() {
-        sshConn.scpRemoteToLocal(RM_TEMPLATES_JSON_FILENAME, workDir + TEMPLATES_JSON_FILENAME + '.orig')
+        String localFilename = workDir + TEMPLATES_JSON_FILENAME + ORIG_FILE_EXTENSION
+        sshConn.scpRemoteToLocal(RM_TEMPLATES_JSON_FILENAME, localFilename)
     }
 
     /**
