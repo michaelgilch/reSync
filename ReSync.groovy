@@ -172,55 +172,58 @@ class ReSync {
     }
 
     /**
-     * Constructs a full filename for an archive based on the archive name and timestamp
+     * Constructs a full filename for an archive based on the archive name and timestamp.
      *
-     * @param String base name for archive
-     * @return String filename including timestamp and extensions
+     * @param basename the base of the archive filename to create, without timestamp or extension 
+     * @return the full filename of archive file to create, with timestamp and extension
      */
     String getArchiveFilename(String basename) {
-        return basename + '_' + timestamp + '.tar.gz'
+        return "${basename}_${timestamp}.tar.gz"
     }
 
     /**
-     * Constructs a tar gz command to create the archive based on the archive name and target
+     * Constructs a tar gz command to create the archive based on the archive name and target.
      *
-     * @param String archiveFilename filename of archive to create
-     * @param String target filepath of archive contents
-     * @return String command to run to produce archive
+     * @param archiveFilename filename of archive to create
+     * @param target filepath of archive contents
+     * @return command to run to produce the archive
      */
     String getTarGzCommand(String archiveFilename, String target) {
-        return 'tar -zcvf ' + archiveFilename + ' ' + target
+        return "tar -zcvf ${archiveFilename} ${target}"
     }
 
     /**
-     * Waits until a filesize is stable (no longer growing or shrinking)
+     * Waits until a filesize is stable (no longer growing).
      *
-     * @param String filePath location of file
+     * @param filepath full path and filename of remote file to monitor
      */
     void waitForStableFileSize(String filePath) {
-        println 'Waiting for stable filesize for ' + filePath
-        int lastFileSize = -1
+        int sleepTimeBetweenFilesizeChecksInMillis = 250       
         int fileSize = getRemoteFileSize(filePath)
+        int lastFileSize = -1
+
+        println "Waiting for stable filesize for ${filePath}"
+        
         while (fileSize != lastFileSize) {
-            sleep(250)
+            sleep(sleepTimeBetweenFilesizeChecksInMillis)
+
             lastFileSize = fileSize
             fileSize = getRemoteFileSize(filePath)
         }
     }
 
     /**
-     * Returns the filesize of a remote file.
+     * Fetches the filesize of a remote file.
      *
-     * @param filePath String path of file to check size
-     * @return int size of file
+     * @param filePath full path and filename of the file to size check
+     * @return filesize in bytes
      */
     int getRemoteFileSize(String filePath) {
-        String command = 'ls -l | grep ' + filePath
-        Map results = sshConn.runCommandGetOutput(command)
+        Map results = sshConn.runCommandGetOutput(getLsCommand(filePath))
 
         long fileSize = 0
         if (results.exitStatus != 0) {
-            println 'Could not get fileSize.'
+            println 'Error: Command failed.'
         } else {
             // Example output: [drwxr-xr-x, 3, root, root, 12288, Aug, 2, 09:06, templates.bak]
             fileSize = results.output.split(' +')[4] as Integer
@@ -230,9 +233,19 @@ class ReSync {
     }
 
     /**
-     * Obtains current date/time
+     * Constructs an `ls` command to get file attributes, including the size in bytes.
      *
-     * @return String date/timestamp
+     * @param filename full path and filename of file to use in construction of command
+     * @return command to run to produce the `ls` results
+     */
+    String getLsCommand(String filename) {
+        return "ls --format=list ${filename}"
+    }
+
+    /**
+     * Obtains current date/time.
+     *
+     * @return string representation of current date/time
      */
     String createTimestampForSession() {
         return new Date().format('yyMMdd-HHmm')
