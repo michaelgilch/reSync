@@ -15,10 +15,12 @@ class ReSync {
 
     static final String CUSTOM_TEMPLATES_DIR = './templates/'
     static final String CUSTOM_IMAGES_DIR = './images/'
+    static final String TEMPLATES_JSON_FILENAME = 'templates.json'
 
     static final String RM_HOME_DIR = './'
     static final String RM_ROOT_DIR = '/usr/share/remarkable/'
     static final String RM_TEMPLATE_DIR = RM_ROOT_DIR + 'templates/'
+    static final String RM_TEMPLATES_JSON_FILENAME = RM_TEMPLATE_DIR + TEMPLATES_JSON_FILENAME
 
     SshConnection sshConn
     String timestamp
@@ -75,7 +77,7 @@ class ReSync {
 
     /**
      * Copies the contents of a local directory to a reMarkable directory, using SCP.
-     * 
+     *
      * @param String localDirectory path of local directory to copy from
      * @param String remarkableDirectory path of remarkable directory to copy to
      */
@@ -96,14 +98,14 @@ class ReSync {
     }
 
     void copyJsonToReMarkable() {
-        String newJsonTemplatesFile = workDir + 'templates.json'
+        String newJsonTemplatesFile = workDir + TEMPLATES_JSON_FILENAME
         sshConn.scpLocalToRemote(newJsonTemplatesFile, RM_TEMPLATE_DIR)
     }
 
     void updateTemplates() {
         fetchTemplatesJsonFile()
 
-        def origJsonData = extractJsonFromFile(new File(workDir + 'templates.orig.json'))
+        def origJsonData = extractJsonFromFile(new File(workDir + TEMPLATES_JSON_FILENAME + '.orig'))
 
         // Remove templates that need to be excluded
         def templatesToExclude = []
@@ -121,7 +123,7 @@ class ReSync {
         }
 
         // Add custom templates
-        def newJsonData = extractJsonFromFile(new File('custom_templates.json'))
+        def newJsonData = extractJsonFromFile(new File('custom_' + TEMPLATES_JSON_FILENAME))
         newJsonData.templates.each { newJson ->
             templates << newJson
         }
@@ -130,7 +132,7 @@ class ReSync {
         def newJsonFileData = ["templates":templates]
         def jsonOutput = JsonOutput.toJson(newJsonFileData)
         def prettyJsonOutput = JsonOutput.prettyPrint(jsonOutput)
-        File newJsonTemplatesFile = new File(workDir + 'templates.json')
+        File newJsonTemplatesFile = new File(workDir + TEMPLATES_JSON_FILENAME)
         newJsonTemplatesFile.write(prettyJsonOutput)
     }
 
@@ -149,7 +151,7 @@ class ReSync {
      * Obtains the templates.json file from the reMarkable2
      */
     void fetchTemplatesJsonFile() {
-        sshConn.scpRemoteToLocal(RM_TEMPLATE_DIR + 'templates.json', workDir + 'templates.orig.json')
+        sshConn.scpRemoteToLocal(RM_TEMPLATES_JSON_FILENAME, workDir + + TEMPLATES_JSON_FILENAME + '.orig')
     }
 
     /**
@@ -200,8 +202,8 @@ class ReSync {
         int lastFileSize = -1
         int fileSize = getRemoteFileSize(filePath)
         while (fileSize != lastFileSize) {
-            lastFileSize = fileSize
             sleep(250)
+            lastFileSize = fileSize
             fileSize = getRemoteFileSize(filePath)
         }
     }
@@ -222,6 +224,7 @@ class ReSync {
         } else {
             // Example output: [drwxr-xr-x, 3, root, root, 12288, Aug, 2, 09:06, templates.bak]
             fileSize = results.output.split(' +')[4] as Integer
+            println 'Size of ' + filePath ' = ' + fileSize
         }
         return fileSize
     }
