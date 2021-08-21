@@ -30,14 +30,21 @@ class ReSync {
 
     static void main(String[] args) {
         ReSync reSync = new ReSync()
+        reSync.connect()
         reSync.performSync()
         reSync.disconnect()
     }
 
+    /**
+     * Constructor to initialize class variables
+     */
     ReSync() {
         sshConn = new SshConnection()
         timestamp = createSessionTimestamp()
+        makeWorkDirectory()
+    }
 
+    void connect() {
         if (sshConn.connect()) {
             println 'Connected.'
         } else {
@@ -51,7 +58,6 @@ class ReSync {
     }
 
     void performSync() {
-        makeWorkDirectory()
         backupReMarkableFiles()
         updateTemplates()
         copyImagesToReMarkable()
