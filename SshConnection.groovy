@@ -279,7 +279,7 @@ class SshConnection {
             command += localFilename
         }
 
-        command += "\n"
+        command += '\n'
         out.write(command.getBytes())
         out.flush()
 
