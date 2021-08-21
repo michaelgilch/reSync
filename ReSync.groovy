@@ -126,12 +126,15 @@ class ReSync {
             templates << newJson
         }
 
-        // Convert back to JSON
-        Map newJsonFileData = ['templates':templates]
-        String jsonOutput = JsonOutput.toJson(newJsonFileData)
+        convertTemplatesListToJsonFile(templates)
+    }
+
+    void convertTemplatesListToJsonFile(List templates) {
+        Map jsonData = ['templates':templates]
+        String jsonOutput = JsonOutput.toJson(jsonData)
         String prettyJsonOutput = JsonOutput.prettyPrint(jsonOutput)
-        File newJsonTemplatesFile = new File(workDir + TEMPLATES_JSON_FILENAME)
-        newJsonTemplatesFile.write(prettyJsonOutput)
+        File newJsonTemplateFile = new File(workDir + TEMPLATES_JSON_FILENAME)
+        newJsonTemplateFile.write(prettyJsonOutput)
     }
 
     Map extractJsonFromFile(File jsonFile) {
