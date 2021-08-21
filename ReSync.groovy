@@ -111,21 +111,12 @@ class ReSync {
 
     void updateTemplates() {
         fetchTemplatesJsonFile()
-
         Map origJsonData = extractJsonFromFile(new File(workDir + TEMPLATES_JSON_FILENAME + ORIG_FILE_EXTENSION))
-
-        // Remove templates that need to be excluded
-        List templatesToExclude = []
-        new File('excludes.txt').eachLine { templateFilename ->
-            templatesToExclude << templateFilename
-        }
-        origJsonData.templates.removeAll { originalTemplate ->
-            originalTemplate.filename in templatesToExclude
-        }
+        Map jsonData = removeUnusedTemplatesFromJson(origJsonData)
 
         // Convert templates to lists
         List templates = []
-        origJsonData.templates.each { template ->
+        jsonData.templates.each { template ->
             templates << template
         }
 
@@ -147,6 +138,24 @@ class ReSync {
         JsonSlurper jsonSlurper = new JsonSlurper()
         Map jsonData = jsonSlurper.parse(jsonFile)
         return jsonData
+    }
+
+    Map removeUnusedTemplatesFromJson(Map origJsonData) {
+        List templatesToExclude = getListOfTemplatesToExclude()
+
+        origJsonData.templates.removeAll { originalTemplate ->
+            originalTemplate.filename in templatesToExclude
+        }
+
+        return origJsonData
+    }
+
+    List getListOfTemplatesToExclude() {
+        List templatesToExclude = []
+        new File('excludes.txt').eachLine { templateFilename ->
+            templatesToExclude << templateFilename
+        }
+        return templatesToExclude
     }
 
     void rebootReMarkable() {
