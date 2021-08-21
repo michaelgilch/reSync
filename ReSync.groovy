@@ -17,6 +17,7 @@ class ReSync {
 
     static final String ORIG_FILE_EXTENSION = '.orig'
     static final String TEMPLATES_JSON_FILENAME = 'templates.json'
+    static final String TEMPLATES_TO_EXCLUDE_FILENAME = 'exclude.txt'
 
     static final String RM_HOME_DIR = './'
     static final String RM_ROOT_DIR = '/usr/share/remarkable/'
@@ -35,7 +36,7 @@ class ReSync {
 
     ReSync() {
         sshConn = new SshConnection()
-        timestamp = createTimestampForSession()
+        timestamp = createSessionTimestamp()
 
         if (sshConn.connect()) {
             println 'Connected.'
@@ -155,7 +156,7 @@ class ReSync {
 
     List getListOfTemplatesToExclude() {
         List templatesToExclude = []
-        new File('excludes.txt').eachLine { templateFilename ->
+        new File(TEMPLATES_TO_EXCLUDE_FILENAME).eachLine { templateFilename ->
             templatesToExclude << templateFilename
         }
         return templatesToExclude
@@ -267,7 +268,7 @@ class ReSync {
      *
      * @return string representation of current date/time
      */
-    String createTimestampForSession() {
+    String createSessionTimestamp() {
         return new Date().format('yyMMdd-HHmm')
     }
 
