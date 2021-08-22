@@ -44,6 +44,9 @@ class ReSync {
         makeWorkDirectory()
     }
 
+    /**
+     * Connects to the reMarkable tablet through an SSH session.
+     */
     void connect() {
         if (sshConn.connect()) {
             println 'Connected.'
@@ -53,6 +56,9 @@ class ReSync {
         }
     }
 
+    /**
+     * Disconnects a reMarkable SSH session.
+     */
     void disconnect() {
         sshConn.disconnect()
     }
@@ -60,9 +66,7 @@ class ReSync {
     void performSync() {
         backupReMarkableFiles()
         updateTemplates()
-        copyImagesToReMarkable()
-        copyTemplatesToReMarkable()
-        copyJsonToReMarkable()
+        copyFilesToReMarkable()
         rebootReMarkable()
 
         println 'reMarkable reSync complete!'
@@ -101,6 +105,12 @@ class ReSync {
             println 'Transferring ' + file
             sshConn.scpLocalToRemote(file.toString(), remarkableDirectory)
         }
+    }
+
+    void copyFilesToReMarkable() {
+        copyImagesToReMarkable()
+        copyTemplatesToReMarkable()
+        copyJsonToReMarkable()
     }
 
     void copyImagesToReMarkable() {
