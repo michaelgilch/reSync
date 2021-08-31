@@ -17,7 +17,7 @@ class ReSync {
 
     static final String ORIG_FILE_EXTENSION = '.orig'
     static final String TEMPLATES_JSON_FILENAME = 'templates.json'
-    static final String TEMPLATES_TO_EXCLUDE_FILENAME = 'exclude.txt'
+    static final String TEMPLATES_TO_EXCLUDE_FILENAME = 'excludes.txt'
 
     static final String RM_HOME_DIR = './'
     static final String RM_ROOT_DIR = '/usr/share/remarkable/'
