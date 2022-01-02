@@ -28,6 +28,15 @@
           ]
         },
         {
+          "name": "Lines mini lg heading",
+          "filename": "lines_mini_lg_heading",
+          "iconCode": "\ue9a8",
+          "categories": [
+            "Custom",
+            "Lines"
+          ]
+        },
+        {
           "name": "Lines mini",
           "filename": "lines_mini",
           "iconCode": "\ue9a8",
