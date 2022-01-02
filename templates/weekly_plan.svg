@@ -7,7 +7,7 @@
    viewBox="0 0 371.47499 495.30001"
    version="1.1"
    id="svg5"
-   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20, custom)"
    sodipodi:docname="weekly_plan.svg"
    inkscape:export-filename="/home/michael/dev/github/reSync/templates/weekly_plan.png"
    inkscape:export-xdpi="96"
@@ -28,14 +28,14 @@
      showgrid="false"
      units="px"
      width="1404px"
-     inkscape:zoom="0.52850974"
-     inkscape:cx="150.42296"
-     inkscape:cy="845.77438"
-     inkscape:window-width="1392"
+     inkscape:zoom="0.81684553"
+     inkscape:cx="553.9603"
+     inkscape:cy="134.66438"
+     inkscape:window-width="1920"
      inkscape:window-height="1031"
-     inkscape:window-x="520"
+     inkscape:window-x="0"
      inkscape:window-y="26"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
      showguides="true"
      inkscape:guide-bbox="true" />
@@ -150,10 +150,6 @@
        d="m 0.04866444,347.45474 c 97.62458856,0 372.05283556,0 372.05283556,0"
        id="path182" />
     <path
-       style="fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0.52916666;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
-       d="m 0.04866444,369.15057 c 97.62458856,0 372.05283556,0 372.05283556,0"
-       id="path186" />
-    <path
        style="fill:#999999;stroke:#999999;stroke-width:0.26458333;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 0.04866444,260.67141 c 97.62458856,0 372.05283556,0 372.05283556,0"
        id="path188" />
@@ -161,6 +157,14 @@
        style="fill:#999999;stroke:#999999;stroke-width:0.26458333;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 0.04866444,379.99849 c 97.62458856,0 372.05283556,0 372.05283556,0"
        id="path190" />
+    <path
+       style="fill:#999999;stroke:#999999;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 0.03272262,369.40175 c 97.62458238,0 372.05280738,0 372.05280738,0"
+       id="path190-3" />
+    <path
+       style="fill:#999999;stroke:#999999;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 0.01868308,358.68056 c 97.62458992,0 372.05281692,0 372.05281692,0"
+       id="path190-3-6" />
     <path
        style="fill:#999999;stroke:#999999;stroke-width:0.26458333;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 0.04866444,401.69432 c 97.62458856,0 372.05283556,0 372.05283556,0"
@@ -220,13 +224,13 @@
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        x="40.564377"
-       y="73.808853"
+       y="73.279686"
        id="text45539"><tspan
          sodipodi:role="line"
          id="tspan45537"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#666666;fill-opacity:1;stroke-width:0.264583"
          x="40.564377"
-         y="73.808853">PRIORITIES</tspan></text>
+         y="73.279686">Priorities</tspan></text>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#666666;stroke-width:0.315722;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect78986"
@@ -236,25 +240,11 @@
        y="78.921227" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#666666;stroke-width:0.315722;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect78986-3"
-       width="5.5477524"
-       height="5.3237906"
-       x="41.157761"
-       y="89.845428" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#666666;stroke-width:0.315722;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect78986-6"
        width="5.5477524"
        height="5.3237906"
        x="41.157761"
        y="100.49445" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#666666;stroke-width:0.315722;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect78986-0"
-       width="5.5477524"
-       height="5.3237906"
-       x="41.157761"
-       y="111.48044" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#666666;stroke-width:0.315722;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect78986-6-6"
@@ -263,75 +253,88 @@
        x="41.157761"
        y="122.37944" />
     <path
-       style="fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0.52916666;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 74.338497,368.86054 c 0,28.01541 0,127.03244 0,127.03244"
-       id="path79865" />
-    <path
-       style="fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0.52916666;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="M 148.323,368.86054 V 496.0988"
-       id="path79867" />
-    <path
-       style="fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0.52916666;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="M 222.3075,368.86054 V 495.77302"
+       style="fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0.974426;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 221.44161,65.428051 V 495.77302"
        id="path79869" />
-    <path
-       style="fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0.52916666;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="M 296.64599,368.86054 V 495.57109"
-       id="path79871" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="25.9736"
-       y="366.4614"
+       x="225.57089"
+       y="73.422417"
        id="text45539-2"><tspan
          sodipodi:role="line"
          id="tspan45537-6"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#666666;fill-opacity:1;stroke-width:0.264583"
-         x="25.9736"
-         y="366.4614">MON</tspan></text>
+         x="225.57089"
+         y="73.422417">Monday</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="102.91016"
-       y="366.39093"
+       x="226.36783"
+       y="149.58061"
        id="text45539-2-1"><tspan
          sodipodi:role="line"
          id="tspan45537-6-8"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#666666;fill-opacity:1;stroke-width:0.264583"
-         x="102.91016"
-         y="366.39093">TUE</tspan></text>
+         x="226.36783"
+         y="149.58061">Tuesday</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="174.42271"
-       y="366.38654"
+       x="226.09244"
+       y="225.24907"
        id="text45539-2-7"><tspan
          sodipodi:role="line"
          id="tspan45537-6-9"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#666666;fill-opacity:1;stroke-width:0.264583"
-         x="174.42271"
-         y="366.38654">WED</tspan></text>
+         x="226.09244"
+         y="225.24907">Wednesday</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="249.19922"
-       y="366.39771"
+       x="226.51782"
+       y="301.49084"
        id="text45539-2-2"><tspan
          sodipodi:role="line"
          id="tspan45537-6-0"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#666666;fill-opacity:1;stroke-width:0.264583"
-         x="249.19922"
-         y="366.39771">THU</tspan></text>
+         x="226.51782"
+         y="301.49084">Thursday</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="326.08521"
-       y="366.44333"
+       x="226.46257"
+       y="377.54971"
        id="text45539-2-23"><tspan
          sodipodi:role="line"
          id="tspan45537-6-7"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#666666;fill-opacity:1;stroke-width:0.264583"
-         x="326.08521"
-         y="366.44333">FRI</tspan></text>
+         x="226.46257"
+         y="377.54971">Friday</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="226.25943"
+       y="453.37375"
+       id="text45539-2-23-7"><tspan
+         sodipodi:role="line"
+         id="tspan45537-6-7-5"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#666666;fill-opacity:1;stroke-width:0.264583"
+         x="226.25943"
+         y="453.37375">Saturday / Sunday</tspan></text>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#666666;stroke-width:0.315722;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect78986-3"
+       width="5.5477524"
+       height="5.3237906"
+       x="41.022575"
+       y="144.36996" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#666666;stroke-width:0.315722;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect78986-0"
+       width="5.5477524"
+       height="5.3237906"
+       x="40.825054"
+       y="165.82788" />
   </g>
 </svg>
