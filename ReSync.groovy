@@ -34,7 +34,8 @@ class ReSync {
         def validArgs = ['sync', 'test']
 
         if (numArgs != 1) {
-            println "TODO: Add Help Here"
+            println "Error: Incorrect number of options. Must use a single option."
+            ReSync.usage()
         } else if (validArgs.contains(args[0])) {
             ReSync reSync = new ReSync()
             reSync.connect()
@@ -47,8 +48,8 @@ class ReSync {
 
             reSync.disconnect()
         } else {
-            println "It does not look like '${args[0]}' is a valid argument."
-            println "TODO print help here"
+            println "Error: Invalid option '${args[0]}'."
+            ReSync.usage()
         }
     }
 
@@ -59,6 +60,16 @@ class ReSync {
         sshConn = new SshConnection()
         timestamp = createSessionTimestamp()
         makeWorkDirectory()
+    }
+
+    /**
+     * Display usage information.
+     */
+    static void usage() {
+        println "./run [option]"
+        println "  options:"
+        println "    sync - performs full synchronization of templates and images"
+        println "    test - verify connectivity with ReMarkable"
     }
 
     /**
@@ -304,5 +315,4 @@ class ReSync {
     String createSessionTimestamp() {
         return new Date().format('yyMMdd-HHmm')
     }
-
 }
