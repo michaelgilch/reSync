@@ -29,10 +29,27 @@ class ReSync {
     String workDir
 
     static void main(String[] args) {
-        ReSync reSync = new ReSync()
-        reSync.connect()
-        reSync.performSync()
-        reSync.disconnect()
+
+        def numArgs = args.size()
+        def validArgs = ['sync', 'test']
+
+        if (numArgs != 1) {
+            println "TODO: Add Help Here"
+        } else if (validArgs.contains(args[0])) {
+            ReSync reSync = new ReSync()
+            reSync.connect()
+
+            if (args[0] == 'sync') {
+                reSync.performSync()
+            } else if (args[0] == 'test') {
+                println "Looks like we connected successfully!"
+            }
+
+            reSync.disconnect()
+        } else {
+            println "It does not look like '${args[0]}' is a valid argument."
+            println "TODO print help here"
+        }
     }
 
     /**
