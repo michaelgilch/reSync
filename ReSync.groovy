@@ -22,6 +22,7 @@ class ReSync {
     static final String RM_HOME_DIR = './'
     static final String RM_ROOT_DIR = '/usr/share/remarkable/'
     static final String RM_TEMPLATE_DIR = RM_ROOT_DIR + 'templates/'
+    static final String RM_NOTEBOOK_DIR = RM_HOME_DIR + '.local/share/remarkable/xochitl/'
     static final String RM_TEMPLATES_JSON_FILENAME = RM_TEMPLATE_DIR + TEMPLATES_JSON_FILENAME
 
     SshConnection sshConn
@@ -41,9 +42,13 @@ class ReSync {
             reSync.connect()
 
             if (args[0] == 'sync') {
+                println "Performing full synchronization of templates and images."
                 reSync.performSync()
             } else if (args[0] == 'test') {
-                println "Looks like we connected successfully!"
+                println "Testing connection."
+            } else if (args[0] == 'backup') {
+                println "Performing backup of notebook data."
+                reSync.backupNotebookFiles()
             }
 
             reSync.disconnect()
@@ -70,6 +75,7 @@ class ReSync {
         println "  options:"
         println "    sync - performs full synchronization of templates and images"
         println "    test - verify connectivity with ReMarkable"
+        println "    backup - perform backup of notebook files"
     }
 
     /**
@@ -119,6 +125,17 @@ class ReSync {
         // Transfer backups to local
         sshConn.scpRemoteToLocal(templatesBackupFile, workDir)
         sshConn.scpRemoteToLocal(imagesBackupFile, workDir)
+    }
+
+    /**
+     * Facilitates the transfer of notebook backups.
+     * 
+     * This operation takes a considerable amount of time due to up to 8 GB of
+     * notebook data.
+     */
+    void backupNotebookFiles() {
+        String notebookBackupFile = createBackupTarGz('notebooks', RM_NOTEBOOK_DIR)
+        sshConn.scpRemoteToLocal(notebookBackupFile, workDir)
     }
 
     /**
@@ -269,11 +286,19 @@ class ReSync {
 
         println "Waiting for stable filesize for ${filePath}"
 
-        while (fileSize != lastFileSize) {
+        def countOfSameReadings = 0
+        while (fileSize != lastFileSize || countOfSameReadings < 3) {
             sleep(sleepTimeBetweenFilesizeChecksInMillis)
 
             lastFileSize = fileSize
             fileSize = getRemoteFileSize(filePath)
+
+            // Make sure there are 3 readings of the same size in a row
+            if (fileSize == lastFileSize) {
+                countOfSameReadings++
+            } else {
+                countOfSameReadings = 0
+            }
         }
     }
 
