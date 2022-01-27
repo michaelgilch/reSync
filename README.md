@@ -11,3 +11,4 @@ These scripts will reload reMarkable2 customizations after a software update, wh
 5. Run `./run` with the appropriate argument
     - **sync** - performs a full sync of the templates and images
     - **test** - simply connects and disconnects, verifying connectivity
+    - **backup** - performs backup of notebook data
